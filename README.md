@@ -2,8 +2,8 @@
 
 ## Obiective
 
-1. **Identificarea clienților fideli** prin intermediul mai multor criterii:
-    - Frecvența achizițiilor
+1. **Identificarea clienților fideli** prin intermediul:
+    - Frecvenței achizițiilor
     - Valoarea achizițiilor
 
 2. **Clasificarea clienților**:
@@ -18,8 +18,6 @@
 4. **Estimarea fluxului de numerar** pentru un anumit numar de luni următoare.
 
 ## Script pentru Crearea Bazei de Date în PostgreSQL
-
-Următorul script SQL va crea tabelul necesar pentru stocarea tranzacțiilor clienților:
 
 ```sql
 CREATE TABLE customer_transactions
