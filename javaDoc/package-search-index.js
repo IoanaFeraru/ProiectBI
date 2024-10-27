@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.mastersdbis.proiectbi"},{"l":"org.mastersdbis.proiectbi.customerTransaction"}];updateSearchResults();
