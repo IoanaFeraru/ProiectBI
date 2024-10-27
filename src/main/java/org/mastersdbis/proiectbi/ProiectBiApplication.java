@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ProiectBiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ProiectBiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ProiectBiApplication.class, args);
+    }
 
 }

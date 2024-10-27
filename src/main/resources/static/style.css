@@ -1,3 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+    padding: 8px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+#paginationControls {
+    margin-top: 10px;
+}
+
+button {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color: #cccccc;
+}
+
+#customersTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#customersTable th {
+    position: sticky; /* Make header sticky */
+    top: 0; /* Position from top */
+    z-index: 10; /* Ensure header is above other elements */
+    background-color: #f2f2f2;
+}
+
+#customersTable tbody tr {
+    transition: background-color 0.3s; /* Smooth transition for highlighting */
+}
+
 #customersTableContainer {
     max-height: 400px; /* Set the maximum height for the table container */
     overflow-y: auto; /* Enable vertical scrolling */
@@ -5,17 +59,26 @@
     margin-top: 10px; /* Optional: add some space above the table */
 }
 
-#customersTable {
-    width: 100%; /* Make the table take full width of the container */
-    border-collapse: collapse; /* Optional: for better styling */
-}
-
-#customersTable th, #customersTable td {
+#customersTable td {
     padding: 8px; /* Optional: add padding to table cells */
     text-align: left; /* Align text to the left */
     border-bottom: 1px solid #ddd; /* Optional: add a bottom border to rows */
 }
 
-#customersTable th {
-    background-color: #f2f2f2; /* Optional: add background color to table header */
+.sort-arrow {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 5px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.sort-arrow.asc {
+    border-bottom: 6px solid black; /* Arrow pointing up */
+}
+
+.sort-arrow.desc {
+    border-top: 6px solid black; /* Arrow pointing down */
 }
