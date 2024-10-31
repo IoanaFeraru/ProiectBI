@@ -50,9 +50,9 @@ function updateChart(data) {
             datasets: [{
                 label: 'Loyalty Score',
                 data: values,
-                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
+                backgroundColor: 'rgb(153,50,204, 0.6)',
+                borderColor: 'rgb(153,50,204, 1)',
+                borderWidth: 2
             }]
         },
         options: {
@@ -113,7 +113,7 @@ function updateTable(customers) {
         const row = document.createElement('tr');
 
         const avgPaymentDelay = customer.avg_payment_delay;
-        row.style.backgroundColor = avgPaymentDelay > delayThreshold ? 'red' : ''; // Highlight bad delays
+        row.style.backgroundColor = avgPaymentDelay > delayThreshold ? 'rgb(205,0,51, 1)' : ''; // Highlight bad delays
 
         row.innerHTML = `
             <td>${customer.client_name}</td>
@@ -229,9 +229,9 @@ async function renderDiscountsByGenderChart() {
             datasets: [{
                 label: 'Total Revenue by Gender',
                 data: revenueData,
-                backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)'],
-                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
-                borderWidth: 1
+                backgroundColor: ['rgba(50, 33, 58, 0.6)', 'rgb(31, 81, 255, 0.6)', 'rgb(255, 16, 240, 0.6)'],
+                borderColor: ['rgba(50, 33, 58, 1)','rgb(31, 81, 255, 1)', 'rgb(255, 16, 240, 1)'],
+                borderWidth: 2
             }]
         },
         options: {
@@ -258,9 +258,9 @@ async function renderDiscountsByAgeGroupChart() {
             datasets: [{
                 label: 'Total Revenue by Age Group',
                 data: revenueData,
-                backgroundColor: 'rgba(255, 206, 86, 0.6)',
-                borderColor: 'rgba(255, 206, 86, 1)',
-                borderWidth: 1
+                backgroundColor: ['rgb(170, 51, 106, 0.6)', 'rgb(93, 63, 211, 0.6)', 'rgb(145, 95, 109, 0.6)', 'rgb(218, 112, 214, 0.6)','rgb(81, 65, 79, 0.6)'],
+                borderColor: ['rgb(170, 51, 106, 1)', 'rgb(93, 63, 211, 1)', 'rgb(145, 95, 109, 1)', 'rgb(218, 112, 214, 1)', 'rgb(81, 65, 79, 1)'],
+                borderWidth: 2
             }]
         },
         options: {
@@ -269,6 +269,7 @@ async function renderDiscountsByAgeGroupChart() {
                 r: {
                     beginAtZero: true
                 }
+
             }
         }
     });
@@ -287,9 +288,9 @@ async function renderDiscountsByTypeChart() {
             datasets: [{
                 label: 'Total Revenue by Discount Type',
                 data: revenueData,
-                backgroundColor: 'rgba(153, 102, 255, 0.6)',
-                borderColor: 'rgba(153, 102, 255, 1)',
-                borderWidth: 1
+                backgroundColor: ['rgb(99, 3, 48, 0.6)', 'rgb(127, 0, 255, 0.6)', 'rgb(114, 47, 55, 0.6)', 'rgb(72, 50, 72, 0.6)', 'rgb(128, 0, 32, 0.6)'],
+                borderColor: ['rgb(99, 3, 48, 1)', 'rgb(127, 0, 255, 1)', 'rgb(114, 47, 55, 1)', 'rgb(72, 50, 72, 1)', 'rgb(128, 0, 32, 1)'],
+                borderWidth: 2
             }]
         },
         options: {
@@ -367,8 +368,8 @@ async function renderCashFlowTrendChart(monthsAhead) {
         const historicalDataset = {
             label: 'Historical Cash Flow',
             data: historicalData,
-            borderColor: 'blue',
-            backgroundColor: 'rgba(0, 0, 255, 0.1)',
+            borderColor: 'rgb(93, 63, 211)',
+            backgroundColor: 'rgb(93, 63, 211, 0.1)',
             fill: true,
         };
 

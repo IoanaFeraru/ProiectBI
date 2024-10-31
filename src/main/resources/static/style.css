@@ -1,84 +1,110 @@
+* {
+  font-family: Montserrat, sans-serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
+  height: 100vh;
+   background: rgb(238,174,202);
+   background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+    color: var(--dark-purple);
 }
 
-h1, h2 {
-    color: #333;
+.container {
+  width: 100%;
+  margin: 0;
+  padding: 20px 0;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+/* Header */
+header {
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-table, th, td {
-    border: 1px solid black;
-    padding: 8px;
+header h1 {
+  text-align: center;
 }
 
-th {
-    background-color: #f2f2f2;
+/* Main Content */
+main {
+  display: flex;
+  gap: 40px;
 }
 
-#paginationControls {
-    margin-top: 10px;
+/* Graficele */
+.left-right-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
 }
 
-button {
-    padding: 5px 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
+.left-chart {
+  margin-bottom: 20px;
 }
 
-button:disabled {
-    background-color: #cccccc;
+.right-chart {
+  margin-bottom: 20px;
 }
 
-#customersTable {
-    width: 100%;
-    border-collapse: collapse;
+/* Diagramele */
+.radial-charts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  border: 3px solid var(--paynes-gray);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
 }
 
-#customersTable th {
-    position: sticky; /* Make header sticky */
-    top: 0; /* Position from top */
-    z-index: 10; /* Ensure header is above other elements */
-    background-color: #f2f2f2;
+.radial-charts h2 {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-#customersTable tbody tr {
-    transition: background-color 0.3s; /* Smooth transition for highlighting */
+/* Table */
+footer {
+  margin-top: 30px;
 }
 
 #customersTableContainer {
-    max-height: 400px; /* Set the maximum height for the table container */
-    overflow-y: auto; /* Enable vertical scrolling */
-    border: 1px solid #ccc; /* Optional: add a border around the container */
-    margin-top: 10px; /* Optional: add some space above the table */
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
-#customersTable td {
-    padding: 8px; /* Optional: add padding to table cells */
-    text-align: left; /* Align text to the left */
-    border-bottom: 1px solid #ddd; /* Optional: add a bottom border to rows */
+#customersTable {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--antiflash-white);
 }
 
-.sort-arrow {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    margin-left: 5px;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    transition: all 0.3s ease;
+#customersTable th, #customersTable td {
+   border: 1px solid var(--paynes-gray);
+  padding: 8px;
+  text-align: left;
 }
 
-.sort-arrow.asc {
-    border-bottom: 6px solid black; /* Arrow pointing up */
+#customersTable th { /* cap tabel */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--dark-purple);
+  color: var(--periwinkle);
 }
 
-.sort-arrow.desc {
-    border-top: 6px solid black; /* Arrow pointing down */
+#customersTable tr:hover {
+    background-color: var(--space-cadet);
+}
+
+/* Color Palette */
+:root {
+  --dark-purple: #32213aff;
+  --space-cadet: #383b53ff;
+  --paynes-gray: #66717eff;
+  --antiflash-white: #e7ecefff;
+  --periwinkle: #c6d8ffff;
 }
