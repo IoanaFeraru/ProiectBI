@@ -42,3 +42,5 @@ CREATE TABLE customer_transactions
 ```
 
 ## Sursa de date csv: [sursaBazaDeDate.csv](sursaBazaDeDate.csv)
+
+## Prezentare video proiect: [screenRecordingOfBIproject.mp4](screenRecordingOfBIproject.mp4)
