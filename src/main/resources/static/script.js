@@ -113,7 +113,7 @@ function updateTable(customers) {
         const row = document.createElement('tr');
 
         const avgPaymentDelay = customer.avg_payment_delay;
-        row.style.backgroundColor = avgPaymentDelay > delayThreshold ? 'rgb(205,0,51, 1)' : ''; // Highlight bad delays
+        row.style.backgroundColor = avgPaymentDelay > delayThreshold ? 'rgb(208,2,153)' : ''; // Highlight bad delays
 
         row.innerHTML = `
             <td>${customer.client_name}</td>
@@ -141,14 +141,14 @@ function filterTable() {
     const rows = document.querySelectorAll('#customersTable tbody tr');
 
     rows.forEach(row => {
-        const ageGroupCell = row.children[1].textContent; // Assuming age group is in the second cell
-        const genderCell = row.children[2].textContent; // Assuming gender is in the third cell
+        const ageGroupCell = row.children[1].textContent;
+        const genderCell = row.children[2].textContent;
 
-        // Check if the row matches the selected filters
+        // Check
         const ageGroupMatch = ageGroupFilter === '' || ageGroupCell === ageGroupFilter;
         const genderMatch = genderFilter === '' || genderCell === genderFilter;
 
-        // Display the row if it matches both filters
+        // Display
         if (ageGroupMatch && genderMatch) {
             row.style.display = '';
         } else {
@@ -161,7 +161,7 @@ function filterTable() {
  * Sortează tabelul de clienți pe baza indexului coloanei specificate. Suportă sortarea pentru coloane de text și numerice.
  * Comută între ordinea de sortare ascendentă și descendentă.
  */
-let sortDirection = Array.from({ length: 6 }, () => true);
+const sortDirection = [true, true, true, true, true, true];
 function sortTable(columnIndex) {
     const table = document.getElementById("customersTable");
     const tbody = table.getElementsByTagName("tbody")[0];
@@ -175,7 +175,6 @@ function sortTable(columnIndex) {
 
         const isNumericColumn = columnIndex === 4 || columnIndex === 5;
 
-        // Convertește în numere dacă este numeric
         const aValue = isNumericColumn ? parseFloat(aText) : aText;
         const bValue = isNumericColumn ? parseFloat(bText) : bText;
 
@@ -187,15 +186,18 @@ function sortTable(columnIndex) {
     tbody.innerHTML = '';
     rows.forEach(row => tbody.appendChild(row));
 
-    // ToDO - Fix on update arrows, aren't shown in column 4 and 5
-    const arrows = document.querySelectorAll('.sort-arrow');
-    arrows.forEach((arrow, index) => {
-        arrow.classList.remove('asc', 'desc');
-        if (index === columnIndex) {
-            arrow.classList.add(sortDirection[columnIndex] ? 'asc' : 'desc');
-        }
-    });
+    document.querySelectorAll('.sort-arrow').forEach(arrow => arrow.classList.remove('selected'));
+
+    const ascArrow = document.getElementById(`arrow-asc-${columnIndex}`);
+    const descArrow = document.getElementById(`arrow-desc-${columnIndex}`);
+
+    if (sortDirection[columnIndex]) {
+        ascArrow.classList.add('selected');
+    } else {
+        descArrow.classList.add('selected');
+    }
 }
+
 
 // Graficele corelațiilor
 /**
@@ -227,7 +229,7 @@ async function renderDiscountsByGenderChart() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Total Revenue by Gender',
+                label: 'Total Discounted Revenue by Gender',
                 data: revenueData,
                 backgroundColor: ['rgba(50, 33, 58, 0.6)', 'rgb(31, 81, 255, 0.6)', 'rgb(255, 16, 240, 0.6)'],
                 borderColor: ['rgba(50, 33, 58, 1)','rgb(31, 81, 255, 1)', 'rgb(255, 16, 240, 1)'],
@@ -256,7 +258,7 @@ async function renderDiscountsByAgeGroupChart() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Total Revenue by Age Group',
+                label: 'Total Discounted Revenue by Age Group',
                 data: revenueData,
                 backgroundColor: ['rgb(170, 51, 106, 0.6)', 'rgb(93, 63, 211, 0.6)', 'rgb(145, 95, 109, 0.6)', 'rgb(218, 112, 214, 0.6)','rgb(81, 65, 79, 0.6)'],
                 borderColor: ['rgb(170, 51, 106, 1)', 'rgb(93, 63, 211, 1)', 'rgb(145, 95, 109, 1)', 'rgb(218, 112, 214, 1)', 'rgb(81, 65, 79, 1)'],
@@ -417,6 +419,15 @@ async function renderCashFlowTrendChart(monthsAhead) {
                         beginAtZero: true,
                     },
                 },
+                plugins: {
+                    legend: {
+                        labels: {
+                            filter: (legendItem, chartData) => {
+                                return legendItem.text !== 'Transition Line';
+                            }
+                        }
+                    }
+                }
             },
         });
     } catch (error) {
@@ -460,4 +471,9 @@ window.onload = function() {
     renderDiscountsByGenderChart();
     renderDiscountsByAgeGroupChart();
     renderDiscountsByTypeChart();
+
+    document.querySelectorAll('.sort-arrow').forEach(arrow => {
+        arrow.classList.remove('selected');
+    });
+    document.getElementById('arrow-asc-0').classList.add('selected');
 };

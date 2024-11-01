@@ -17,95 +17,131 @@
     <!-- Titlu -->
     <header>
         <img width="38" height="38" src="https://img.icons8.com/external-filled-outline-icons-pause-08/64/external-charts-business-filled-outline-icons-pause-08-3.png" alt="external-charts-business-filled-outline-icons-pause-08-3"/>
-        <h1>Customer Transactions</h1>
+        <h1>Customer decision-making</h1>
     </header>
 
     <!-- Zona centrală cu graficul de loialitate, diagramele radiale și graficul de estimări -->
     <main>
-        <!-- Graficul de loialitate -->
         <div class="left-right-container">
-        <section class="left-chart">
-            <h2>Top Loyal Customers</h2>
-            <form id="topCustomersForm">
-                <label for="topX">Number of Top Loyal Customers:</label>
-                <input type="range" id="topX" name="topX" min="10" max="100" value="10" step="1">
-                <span id="topXValue">10</span>
-                <div id="loyaltyCriteria">
-                    <label>Total Spent
-                        <input type="radio" name="loyaltyCriteria" value="total_spent" onchange="fetchTopLoyalCustomers()">
-                    </label>
-                    <label>Purchase Frequency
-                        <input type="radio" name="loyaltyCriteria" value="purchase_frequency" onchange="fetchTopLoyalCustomers()">
-                    </label>
-                    <label>Combined
-                        <input type="radio" name="loyaltyCriteria" value="combined" checked onchange="fetchTopLoyalCustomers()">
-                    </label>
-                </div>
-            </form>
-            <canvas id="loyaltyChart" width="250" height="100"></canvas>
-        </section>
+            <!-- Graficul de loialitate -->
+            <section class="left-chart">
+                <h2>Top Loyal Customers</h2>
+                <form id="topCustomersForm">
+                    <label for="topX">Number of Top Loyal Customers:</label>
+                    <input type="range" id="topX" name="topX" min="10" max="100" value="10" step="1">
+                    <span id="topXValue">10</span>
+                    <div id="loyaltyCriteria">
+                        <label>Total Spent
+                            <input type="radio" name="loyaltyCriteria" value="total_spent" onchange="fetchTopLoyalCustomers()">
+                        </label>
+                        <label>Purchase Frequency
+                            <input type="radio" name="loyaltyCriteria" value="purchase_frequency" onchange="fetchTopLoyalCustomers()">
+                        </label>
+                        <label>Combined
+                            <input type="radio" name="loyaltyCriteria" value="combined" checked onchange="fetchTopLoyalCustomers()">
+                        </label>
+                    </div>
+                </form>
+                <canvas id="loyaltyChart" width="250" height="100"></canvas>
+            </section>
 
-        <!-- Graficul de estimări -->
-        <section class="right-chart">
-            <h2>Estimate Cash Flow</h2>
-            <input type="range" id="monthSlider" min="0" max="36" value="6" />
-            <span id="selectedMonths">6</span> months ahead
-            <canvas id="cashFlowChart" width="250" height="100"></canvas>
-        </section>
+            <!-- Graficul de estimări -->
+            <section class="right-chart">
+                <h2>Estimate Cash Flow</h2>
+                <input type="range" id="monthSlider" min="0" max="12" value="6" />
+                <span id="selectedMonths">6</span> months ahead
+                <canvas id="cashFlowChart" width="250" height="100"></canvas>
+            </section>
         </div>
+
         <!-- Diagramele radiale -->
         <section class="radial-charts">
-            <h2>Correlate Discounts</h2>
-            <canvas id="discountsByGenderChart" width="350" height="350"></canvas>
-            <canvas id="discountsByAgeGroupChart" width="350" height="350"></canvas>
-            <canvas id="discountsByTypeChart" width="350" height="350"></canvas>
+            <div class="chart-container">
+                <div class="chart-card">
+                    <h3>Total Revenue when discounts are applied by Gender</h3>
+                    <canvas id="discountsByGenderChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Total Revenue when discounts are applied by Age Group</h3>
+                    <canvas id="discountsByAgeGroupChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Total Revenue by Discount Code</h3>
+                    <canvas id="discountsByTypeChart"></canvas>
+                </div>
+            </div>
         </section>
+
     </main>
+
 
     <!-- Tabelul cu date -->
     <footer>
         <h2>All Customers</h2>
         <div id="customersTableContainer">
-            <label for="delayThreshold">Set Payment Delay Threshold (days):</label>
-            <input type="number" id="delayThreshold" value="15" min="0">
-            <table id="customersTable">
-                <thead>
-                <tr>
-                    <th onclick="sortTable(0)">Name <span class="sort-arrow asc selected" id="arrow-0"></span></th>
-                    <th>
-                        <select id="ageGroupFilter" onchange="filterTable()" style="width: 100%; border: none; background-color: transparent;">
-                            <option value="">Age Group</option>
-                            <option value="under 18">under 18</option>
-                            <option value="18-25">18-25</option>
-                            <option value="25-45">25-45</option>
-                            <option value="45-60">45-60</option>
-                            <option value="60 and above">60 and above</option>
-                        </select>
-                    </th>
-                    <th>
-                        <select id="genderFilter" onchange="filterTable()" style="width: 100%; border: none; background-color: transparent;">
-                            <option value="">Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </th>
-                    <th onclick="sortTable(3)">Purchase Frequency <span class="sort-arrow" id="arrow-3"></span></th>
-                    <th onclick="sortTable(4)">Total Spent ($) <span class="sort-arrow" id="arrow-4"></span></th>
-                    <th onclick="sortTable(5)">Average Payment Delay (days) <span class="sort-arrow" id="arrow-5"></span></th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- Data will be populated here dynamically -->
-                </tbody>
-            </table>
+            <div class="threshold-container">
+                <label for="delayThreshold">Set Payment Delay Threshold (days):</label>
+                <input type="number" id="delayThreshold" value="15" min="0">
+            </div>
+            <div class="table-wrapper">
+                <table id="customersTable">
+                    <thead>
+                    <tr>
+                        <th onclick="sortTable(0)" class="sortable">
+                            Name
+                            <span class="sort-arrow asc selected" id="arrow-asc-0"></span>
+                            <span class="sort-arrow desc" id="arrow-desc-0"></span>
+                        </th>
+                        <th>
+                            <select id="ageGroupFilter" onchange="filterTable()">
+                                <option value="">Age Group</option>
+                                <option value="under 18">under 18</option>
+                                <option value="18-25">18-25</option>
+                                <option value="25-45">25-45</option>
+                                <option value="45-60">45-60</option>
+                                <option value="60 and above">60 and above</option>
+                            </select>
+                        </th>
+                        <th>
+                            <select id="genderFilter" onchange="filterTable()">
+                                <option value="">Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </th>
+                        <th onclick="sortTable(3)" class="sortable">
+                            Purchase Frequency
+                            <span class="sort-arrow asc selected" id="arrow-asc-3"></span>
+                            <span class="sort-arrow desc" id="arrow-desc-3"></span>
+                        </th>
+                        <th onclick="sortTable(4)" class="sortable">
+                            Total Spent ($)
+                            <span class="sort-arrow asc selected" id="arrow-asc-4"></span>
+                            <span class="sort-arrow desc" id="arrow-desc-4"></span>
+                        </th>
+                        <th onclick="sortTable(5)" class="sortable">
+                            Average Payment Delay (days)
+                            <span class="sort-arrow asc selected" id="arrow-asc-5"></span>
+                            <span class="sort-arrow desc" id="arrow-desc-5"></span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- AICI POPULEAZA TABEL -->
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div id="loading" style="display: none;">
-            <p>Loading, please wait...</p>
+        <div id="loading" class="loading-container" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading data, please wait...</p>
         </div>
     </footer>
-</div>
 
+
+</div> <!-- Closing the container div -->
 <script th:src="@{/script.js}"></script>
 </body>
 </html>
+
