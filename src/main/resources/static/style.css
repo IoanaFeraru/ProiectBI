@@ -346,6 +346,47 @@ span {
   margin: 0;
 }
 
+button {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px 20px;
+  color: var(--antiflash-white);
+  background-color: var(--space-cadet);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-left: 44%;
+  margin-top: 20px;
+}
+
+button:hover {
+  background-color: var(--dark-purple);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(2px);
+}
+
+button:focus {
+  outline: none;
+  box-shadow: var(--paynes-gray);
+}
+
+button.export-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button.export-icon img {
+  width: 18px;
+  height: 18px;
+}
+
+
 /* Color Palette */
 :root {
   --dark-purple: #32213aff;

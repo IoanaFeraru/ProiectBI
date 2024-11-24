@@ -32,17 +32,17 @@
                     <span id="topXValue">10</span>
                     <div id="loyaltyCriteria">
                         <label>Total Spent
-                            <input type="radio" name="loyaltyCriteria" value="total_spent" onchange="fetchTopLoyalCustomers()">
+                            <input type="radio" name="loyaltyCriteria" value="total_spent" checked onchange="fetchTopLoyalCustomers()">
                         </label>
                         <label>Purchase Frequency
                             <input type="radio" name="loyaltyCriteria" value="purchase_frequency" onchange="fetchTopLoyalCustomers()">
                         </label>
-                        <label>Combined
-                            <input type="radio" name="loyaltyCriteria" value="combined" checked onchange="fetchTopLoyalCustomers()">
-                        </label>
                     </div>
                 </form>
                 <canvas id="loyaltyChart" width="250" height="100"></canvas>
+                <button id="exportButton" class="export-icon">
+                    <img src="https://img.icons8.com/?size=100&id=eQywUgX10I1j&format=png&color=FFFFFF" alt="Export Icon">Export Excel
+                </button>
             </section>
 
             <!-- Graficul de estimări -->
@@ -142,6 +142,7 @@
 
 </div> <!-- Closing the container div -->
 <script th:src="@{/script.js}"></script>
+<script th:src="@{/excelScript.js}"></script>
 </body>
 </html>
 

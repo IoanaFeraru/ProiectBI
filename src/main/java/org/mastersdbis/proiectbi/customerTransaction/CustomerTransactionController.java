@@ -1,10 +1,13 @@
 package org.mastersdbis.proiectbi.customerTransaction;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -96,5 +99,19 @@ public class CustomerTransactionController {
 
         List<Double> estimatedCashFlows = customerTransactionService.estimateCashFlow(monthsAhead);
         return ResponseEntity.ok(estimatedCashFlows);
+    }
+
+    @GetMapping("/export-all-customers")
+    public ResponseEntity<byte[]> exportAllCustomers(@RequestParam int topX, @RequestParam String loyaltyCriteria) {
+        try {
+            ByteArrayOutputStream excelFile = customerTransactionService.generateAllCustomersExcel(topX, loyaltyCriteria);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=customerLoyalty.xlsx")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(excelFile.toByteArray());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
