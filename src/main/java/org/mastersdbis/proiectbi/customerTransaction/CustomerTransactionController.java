@@ -1,13 +1,10 @@
 package org.mastersdbis.proiectbi.customerTransaction;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -26,9 +23,7 @@ public class CustomerTransactionController {
      * @return ResponseEntity cu lista de clienți cei mai loiali și statusul HTTP OK
      */
     @GetMapping("/top-loyal-customers")
-    public ResponseEntity<List<Map<String, Object>>> getTopLoyalCustomers(
-            @RequestParam int topX,
-            @RequestParam String loyaltyCriteria) {
+    public ResponseEntity<List<Map<String, Object>>> getTopLoyalCustomers(@RequestParam int topX, @RequestParam String loyaltyCriteria) {
         List<Map<String, Object>> topCustomers = customerTransactionService.getTopLoyalCustomers(topX, loyaltyCriteria);
         return new ResponseEntity<>(topCustomers, HttpStatus.OK);
     }
@@ -101,17 +96,18 @@ public class CustomerTransactionController {
         return ResponseEntity.ok(estimatedCashFlows);
     }
 
-    @GetMapping("/export-all-customers")
-    public ResponseEntity<byte[]> exportAllCustomers(@RequestParam int topX, @RequestParam String loyaltyCriteria) {
-        try {
-            ByteArrayOutputStream excelFile = customerTransactionService.generateAllCustomersExcel(topX, loyaltyCriteria);
+    @GetMapping("/getAgeGroupState")
+    public List<Map<String, Object>> getAgeGroupState(@RequestParam String state) {
+        return customerTransactionService.getAgeGroupByState(state);
+    }
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=customerLoyalty.xlsx")
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(excelFile.toByteArray());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+    @GetMapping("/getProductState")
+    public List<Map<String, Object>> getProductState(@RequestParam String state) {
+        return customerTransactionService.getProduseByState(state);
+    }
+
+    @GetMapping("/getVanzariState")
+    public List<Map<String, Object>> getVanzariByState() {
+        return customerTransactionService.getVanzariState();
     }
 }

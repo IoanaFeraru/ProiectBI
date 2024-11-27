@@ -10,4 +10,19 @@ public class ViewController {
     public String customerTransactions() {
         return "customerTransactions";
     }
+
+    @GetMapping("/maps")
+    public String maps() {
+        return "maps";
+    }
+
+    @GetMapping("/mapspie")
+    public String mapspie() {
+        return "mapspie";
+    }
+
+    @GetMapping("/mapsheat")
+    public String mapsheat() {
+        return "mapsheat";
+    }
 }

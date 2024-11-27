@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cartografie</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        :root {
+            --dark-purple: #32213aff;
+            --space-cadet: #383b53ff;
+            --paynes-gray: #66717eff;
+            --antiflash-white: #e7ecefff;
+            --periwinkle: #c6d8ffff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--antiflash-white);
+            color: var(--space-cadet);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 10px;
+            font-size: 20px;
+            background-color: var(--dark-purple);
+            color: var(--antiflash-white);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 15px;
+        }
+
+        #map {
+            flex: 1;
+            border-radius: 15px;
+            border: 1px solid var(--periwinkle);
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #chart-container {
+            width: 300px;
+            height: 350px;
+            position: absolute;
+            display: none;
+            z-index: 9999;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px var(--space-cadet);
+            background-color: var(--antiflash-white);
+            padding: 10px;
+        }
+
+        #chart-title {
+            text-align: center;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        #footer-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: var(--dark-purple);
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: var(--antiflash-white);
+            color: var(--space-cadet);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--periwinkle);
+        }
+
+        .leaflet-container {
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    Diagrame pe hărți
+</header>
+
+<div id="container">
+    <div id="map"></div>
+
+    <div id="chart-container">
+        <h3 id="chart-title" style="text-align: center; margin: 10px 0;">Titlul diagramei</h3>
+        <canvas id="pieChartCanvas"></canvas>
+    </div>
+</div>
+
+<div id="footer-buttons">
+    <a href="/maps" class="btn">
+        <button class="btn">Vânzările pe baza vârstei clienților</button>
+    </a>
+    <a href="/mapspie" class="btn">
+        <button class="btn">Categorii de obiecte</button>
+    </a>
+    <a href="/mapsheat" class="btn">
+        <button class="btn">Heatmap sumă vânzări</button>
+    </a>
+</div>
+
+
+<script>
+    var map = L.map('map').setView([37.8, -96], 4);
+
+    var mouseX = 0;
+    var mouseY = 0;
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">Carto</a>'
+    }).addTo(map);
+
+    var currentStateLayer = null;
+
+    fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/refs/heads/master/data/geojson/us-states.json')
+        .then(response => response.json())
+        .then(data => {
+            L.geoJSON(data, {
+                onEachFeature: function (feature, layer) {
+                    layer.on({
+                        mouseover: function(e) {
+                            currentStateLayer = e.target;
+                            var state = e.target.feature.properties.name;
+                            var stateCenter = e.target.getBounds().getCenter();
+                            loadBarChartData(state, stateCenter);
+                        },
+                        mouseout: function(e) {
+                            currentStateLayer = null;
+                            checkMouseOut();
+                        }
+                    });
+                }
+            }).addTo(map);
+        });
+
+    function isMouseOverBarChart() {
+        var chartContainer = document.getElementById('chart-container');
+        var rect = chartContainer.getBoundingClientRect();
+        return mouseX >= rect.left && mouseX <= rect.right && mouseY >= rect.top && mouseY <= rect.bottom;
+    }
+
+    function isMouseOverState() {
+        if (!currentStateLayer) return false;
+        return currentStateLayer._bounds.contains(map.containerPointToLatLng([mouseX, mouseY]));
+    }
+
+    function checkMouseOut() {
+        setTimeout(function () {
+            if (!isMouseOverBarChart() && !isMouseOverState()) {
+                hideBarChart();
+            }
+        }, 200);
+    }
+
+    function loadBarChartData(state, stateCenter) {
+        var chartTitle = document.getElementById('chart-title');
+        chartTitle.textContent = `${state}`;
+
+        fetch('transactions/getAgeGroupState?state=' + state)
+            .then(response => response.json())
+            .then(data => {
+                createBarChart(data, stateCenter);
+            });
+    }
+
+    function createBarChart(data, stateCenter) {
+        var existingChart = Chart.getChart("pieChartCanvas");
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        var ctx = document.getElementById('pieChartCanvas').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(item => item.age_group),
+                datasets: [{
+                    data: data.map(item => item.total_sales),
+                    backgroundColor: ['#FF9999', '#66B3FF', '#99FF99', '#FFCC99', '#FFB3E6'],
+                    borderColor: '#e7ecefff',
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        enabled: true,
+                    },
+                    datalabels: {
+                        color: '#383b53ff',
+                        font: {
+                            size: 10,
+                        },
+                        formatter: function (value, context) {
+                            return `$${value}`;
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    },
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 0,
+                            minRotation: 0,
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+        var chartContainer = document.getElementById('chart-container');
+        chartContainer.style.position = 'absolute';
+        chartContainer.style.left = (map.latLngToContainerPoint(stateCenter).x - chartContainer.offsetWidth / 2) + 'px';
+        chartContainer.style.top = (map.latLngToContainerPoint(stateCenter).y - chartContainer.offsetHeight / 2) + 'px';
+        chartContainer.style.display = 'block';
+
+        chartContainer.style.width = '410px';
+        chartContainer.style.height = '250px';
+    }
+
+    function hideBarChart() {
+        var chartContainer = document.getElementById('chart-container');
+        chartContainer.style.display = 'none';
+    }
+
+    document.addEventListener('mousemove', function (event) {
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+
+        if (!isMouseOverState() && !isMouseOverBarChart()) {
+            hideBarChart();
+        }
+    });
+</script>
+</body>
+</html>

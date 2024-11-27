@@ -1,23 +1,14 @@
 package org.mastersdbis.proiectbi.customerTransaction;
 
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xddf.usermodel.XDDFColor;
-import org.apache.poi.xddf.usermodel.XDDFSolidFillProperties;
-import org.apache.poi.xddf.usermodel.chart.*;
-import org.apache.poi.xssf.usermodel.*;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class CustomerTransactionService {
@@ -202,98 +193,44 @@ public class CustomerTransactionService {
         return futureCashFlows;
     }
 
-    public ByteArrayOutputStream generateAllCustomersExcel(int topX, String tip) throws IOException {
-        List<Map<String, Object>> customers = getExcelCustomersGrafic1();
-
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("All Customers");
-
-        Row headerRow = sheet.createRow(0);
-        String[] headers = {"Client Name", "Purchase Frequency", "Total Spent"};
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
-            cell.setCellStyle(getHeaderCellStyle(workbook));
-        }
-
-        int rowIdx = 1;
-        for (Map<String, Object> customer : customers) {
-            Row row = sheet.createRow(rowIdx++);
-            row.createCell(0).setCellValue((String) customer.get("client_name"));
-            row.createCell(1).setCellValue(((Number) customer.get("purchase_frequency")).longValue());
-            row.createCell(2).setCellValue(((Number) customer.get("total_spent")).doubleValue());
-        }
-
-        createBarChart(sheet, customers, rowIdx, topX, tip);
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        workbook.write(bos);
-        workbook.close();
-
-        return bos;
-    }
-
-
-    public List<Map<String, Object>> getExcelCustomersGrafic1() {
+    //MAPS
+    public List<Map<String, Object>> getAgeGroupByState(String state) {
         String sql = """
-        SELECT client_name, COUNT(tid) AS purchase_frequency, SUM(net_amount) AS total_spent
+        SELECT
+            purchaselocation AS state,
+            age_group,
+            SUM(net_amount) AS total_sales
         FROM customer_transactions
-        GROUP BY client_name
-        ORDER BY total_spent DESC
+        WHERE purchaselocation = ?
+        GROUP BY purchaselocation, age_group
+        ORDER BY state;
     """;
+        return jdbcTemplate.queryForList(sql, state);
+    }
+
+    public List<Map<String, Object>> getProduseByState(String state) {
+        String sql = """
+        SELECT
+            purchaselocation AS state,
+            product_category AS produs,
+            COUNT(product_category) AS produsTotal
+        FROM customer_transactions
+        WHERE purchaselocation = ?
+        GROUP BY purchaselocation, product_category
+        ORDER BY state;
+    """;
+        return jdbcTemplate.queryForList(sql, state);
+    }
+
+    public List<Map<String, Object>> getVanzariState() {
+        String sql = """
+                SELECT
+                    purchaselocation AS state,
+                    ROUND(SUM(net_amount)) AS total_sales
+                FROM customer_transactions
+                GROUP BY purchaselocation
+                ORDER BY state;
+                """;
         return jdbcTemplate.queryForList(sql);
-    }
-
-    private void createBarChart(Sheet sheet, List<Map<String, Object>> customers, int numRows, int topX, String tip) {
-        List<Map<String, Object>> topCustomers = customers.stream()
-                .limit(topX)
-                .toList();
-
-        XSSFDrawing drawing = (XSSFDrawing) sheet.createDrawingPatriarch();
-
-        XSSFClientAnchor anchor = drawing.createAnchor(0, 0, 0, 0, 5, 0, 15, 30);
-
-        XSSFChart chart = drawing.createChart(anchor);
-        chart.setTitleText("Customer Spending and Purchase Frequency");
-        chart.setTitleOverlay(false);
-
-        XDDFCategoryAxis bottomAxis = chart.createCategoryAxis(AxisPosition.BOTTOM);
-        bottomAxis.setTitle("Client Name");
-        XDDFValueAxis leftAxis = chart.createValueAxis(AxisPosition.LEFT);
-
-
-        XDDFDataSource<String> clientNames = XDDFDataSourcesFactory.fromStringCellRange(
-                (XSSFSheet) sheet, new CellRangeAddress(1, topX, 0, 0));
-
-        XDDFNumericalDataSource<Double> totalSpent = XDDFDataSourcesFactory.fromNumericCellRange(
-                (XSSFSheet) sheet, new CellRangeAddress(1, topX, 2, 2));
-
-        XDDFNumericalDataSource<Double> purchaseFrequency = XDDFDataSourcesFactory.fromNumericCellRange(
-                (XSSFSheet) sheet, new CellRangeAddress(1, topX, 1, 1));
-
-        XDDFChartData data = chart.createData(ChartTypes.BAR, bottomAxis, leftAxis);
-
-        if ("total_spent".equals(tip)) {
-            XDDFChartData.Series series1 = data.addSeries(clientNames, totalSpent);
-            series1.setTitle("Total Spent", null);
-            series1.setFillProperties(new XDDFSolidFillProperties(XDDFColor.from(255, 0, 0)));
-            leftAxis.setTitle("Amount");
-        } else if ("purchase_frequency".equals(tip)) {
-            XDDFChartData.Series series2 = data.addSeries(clientNames, purchaseFrequency);
-            series2.setTitle("Purchase Frequency", null);
-            series2.setFillProperties(new XDDFSolidFillProperties(XDDFColor.from(0, 0, 255)));
-            leftAxis.setTitle("Frequency");
-        }
-
-        chart.plot(data);
-    }
-
-
-    private CellStyle getHeaderCellStyle(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        Font font = workbook.createFont();
-        font.setBold(true);
-        style.setFont(font);
-        return style;
     }
 }

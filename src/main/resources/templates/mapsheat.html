@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mapă Coropletă cu Vânzări</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+        :root {
+            --dark-purple: #32213aff;
+            --space-cadet: #383b53ff;
+            --paynes-gray: #66717eff;
+            --antiflash-white: #e7ecefff;
+            --periwinkle: #c6d8ffff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--antiflash-white);
+            color: var(--space-cadet);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 10px;
+            font-size: 20px;
+            background-color: var(--dark-purple);
+            color: var(--antiflash-white);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 15px;
+        }
+
+        #map {
+            flex: 1;
+            border-radius: 15px;
+            border: 1px solid var(--periwinkle);
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #chart-container {
+            width: 300px;
+            height: 350px;
+            position: absolute;
+            display: none;
+            z-index: 9999;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px var(--space-cadet);
+            background-color: var(--antiflash-white);
+            padding: 10px;
+        }
+
+        #chart-title {
+            text-align: center;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        #footer-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: var(--dark-purple);
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: var(--antiflash-white);
+            color: var(--space-cadet);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--periwinkle);
+        }
+
+        .leaflet-container {
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    Diagrame pe hărți
+</header>
+
+<div id="container">
+    <div id="map"></div>
+</div>
+
+<div id="footer-buttons">
+    <a href="/maps" class="btn">
+        <button class="btn">Vânzările pe baza vârstei clienților</button>
+    </a>
+    <a href="/mapspie" class="btn">
+        <button class="btn">Categorii de obiecte</button>
+    </a>
+    <a href="/mapsheat" class="btn">
+        <button class="btn">Heatmap sumă vânzări</button>
+    </a>
+</div>
+
+
+<script>
+    var map = L.map('map').setView([37.8, -96], 4);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">Carto</a>'
+    }).addTo(map);
+
+    fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/refs/heads/master/data/geojson/us-states.json')
+        .then(response => response.json())
+        .then(statesData => {
+            fetch('transactions/getVanzariState')
+                .then(response => response.json())
+                .then(salesData => {
+                    var salesByState = {};
+                    salesData.forEach(function(item) {
+                        salesByState[item.state] = item.total_sales;
+                    });
+
+                    var values = Object.values(salesByState);
+                    var minSales = Math.min(...values);
+                    var maxSales = Math.max(...values);
+
+                    function getColor(d) {
+                        var scale = d3.scaleLinear()
+                            .domain([minSales, maxSales])
+                            .range(['#FFEDA0', '#800026']);
+                        return scale(d);
+                    }
+
+                    function style(feature) {
+                        var stateName = feature.properties.name;
+                        var value = salesByState[stateName] || 0;
+                        return {
+                            fillColor: getColor(value),
+                            weight: 2,
+                            opacity: 1,
+                            color: 'white',
+                            dashArray: '3',
+                            fillOpacity: 0.7
+                        };
+                    }
+
+                    function onEachFeature(feature, layer) {
+                        var stateName = feature.properties.name;
+                        var value = salesByState[stateName] || 0;
+                        layer.bindTooltip(`${stateName}: $${value.toLocaleString()}`, {
+                            permanent: false,
+                            direction: 'auto',
+                            opacity: 0.7
+                        });
+
+                        layer.on({
+                            mouseover: function(e) {
+                                var layer = e.target;
+                                layer.setStyle({
+                                    weight: 3,
+                                    color: '#666',
+                                    dashArray: '',
+                                    fillOpacity: 0.7
+                                });
+                                if (!L.Browser.ie && !L.Browser.opera) {
+                                    layer.bringToFront();
+                                }
+                            },
+                            mouseout: function(e) {
+                                geojson.resetStyle(e.target);
+                            }
+                        });
+                    }
+
+                    var geojson = L.geoJSON(statesData, {
+                        style: style,
+                        onEachFeature: onEachFeature
+                    }).addTo(map);
+
+                    var legend = L.control({ position: 'bottomright' });
+
+                    legend.onAdd = function () {
+                        var div = L.DomUtil.create('div', 'info legend');
+                        var grades = [minSales, (minSales + maxSales) / 2, maxSales];
+                        var labels = [];
+
+                        var gradientDiv = L.DomUtil.create('div', 'gradient');
+                        gradientDiv.style.background = `linear-gradient(to right, ${getColor(minSales)} 0%, ${getColor(maxSales)} 100%)`;
+                        gradientDiv.style.height = '20px';
+                        gradientDiv.style.width = '200px';
+                        gradientDiv.style.borderRadius = '5px';
+                        gradientDiv.style.marginBottom = '5px';
+
+                        div.appendChild(gradientDiv);
+
+                        div.innerHTML +=
+                            '<span style="float: left; font-size: 12px;">Min: $' + Math.round(minSales).toLocaleString() + '</span>' +
+                            '<span style="float: right; font-size: 12px;">Max: $' + Math.round(maxSales).toLocaleString() + '</span>';
+
+                        return div;
+                    };
+                    legend.addTo(map);
+                });
+        });
+</script>
+</body>
+</html>
